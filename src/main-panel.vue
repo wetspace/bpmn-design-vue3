@@ -1,4 +1,6 @@
 <template>
-    <div>面板</div>
+    <div>面板
+    </div>
 </template>
-<script setup lang="ts"></script>
+<script setup lang="ts">
+</script>
