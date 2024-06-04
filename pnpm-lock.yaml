@@ -20,6 +20,9 @@ importers:
       bpmn-js:
         specifier: ^17.8.1
         version: 17.8.1
+      didi:
+        specifier: ^10.2.2
+        version: 10.2.2
       element-plus:
         specifier: ^2.7.3
         version: 2.7.3(vue@3.4.27(typescript@5.4.5))

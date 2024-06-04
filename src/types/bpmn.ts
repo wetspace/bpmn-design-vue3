@@ -1,0 +1,1 @@
+export type BpmnModuleDeclaration = import('didi').ModuleDeclaration;

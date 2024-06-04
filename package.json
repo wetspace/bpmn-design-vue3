@@ -17,6 +17,7 @@
     "@element-plus/icons-vue": "^2.3.1",
     "@wetspace/pro-components": "^0.0.4",
     "bpmn-js": "^17.8.1",
+    "didi": "^10.2.2",
     "element-plus": "^2.7.3",
     "vue": "^3.4.21"
   },

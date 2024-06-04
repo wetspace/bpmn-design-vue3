@@ -1,10 +1,9 @@
 <template>
-  <div>
-    <MainVue></MainVue>
+  <div style="height: 100vh;">
+    <BpmnDesign></BpmnDesign>
   </div>
 </template>
 <script setup lang="ts">
-
-import MainVue from './main-panel.vue';
+import BpmnDesign from './bpmn-design.vue';
 
 </script>

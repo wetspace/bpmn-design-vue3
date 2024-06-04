@@ -1,0 +1,26 @@
+/** 
+ * 基础样式
+ */
+ @use 'bpmn-js/dist/assets/bpmn-js.css';
+ @use  'bpmn-js/dist/assets/bpmn-font/css/bpmn.css'; // 包含了与 BPMN 字体和图标相关的所有必要的样式规则
+ @use  'bpmn-js/dist/assets/bpmn-font/css/bpmn-codes.css'; // 这些类和规则定义了 BPMN 符号（如活动、事件、网关等）的样式
+
+ /**
+ * 左侧面板样式
+ */
+@use 'bpmn-js/dist/assets/diagram-js.css';
+@use 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css';
+
+.wet-bpmndesign{
+    height: 100%;
+    position: relative;
+}
+.wet-bpmn{
+    &__toptool{
+        position: absolute;
+        left: 10px;
+        top: 2px;
+        right: 10px;
+        z-index: 500;
+    }
+}
