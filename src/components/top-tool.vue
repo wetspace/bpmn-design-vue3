@@ -1,7 +1,13 @@
 <template>
     <div class="wet-bpmn__toptool">
         <ElSpace>
-            <ElButtonGroup></ElButtonGroup>
+            <ElButtonGroup>
+                <ElButton>保存流程</ElButton>
+                <ElButton>打开</ElButton>
+                <ToolViewUpload></ToolViewUpload>
+                <ToolViewUpload></ToolViewUpload>
+                <ElButton>模拟</ElButton>
+            </ElButtonGroup>
         </ElSpace>
         <ElSpace>
             <ElButtonGroup>
@@ -17,7 +23,7 @@
 <script setup lang="ts">
 import { ElSpace,ElIcon,ElButton,ElButtonGroup } from 'element-plus'
 import { Refresh } from '@element-plus/icons-vue'
-
+import ToolViewUpload from './tool-view-upload.vue';
 
 
 </script> 

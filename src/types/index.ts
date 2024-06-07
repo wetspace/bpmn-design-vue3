@@ -1,5 +1,11 @@
-import type { PropType,ShallowRef } from 'vue'
-import type { BpmnModuleDeclaration } from './bpmn'
+import type { PropType,ShallowRef,ComputedRef} from 'vue'
+import type { BpmnModuleDeclaration,BpmnElement} from './bpmn'
+import type Modeler from 'bpmn-js/lib/Modeler'
+
+export type WetBpmnProcessType = 'activiti' | 'camunda'|'flowable'
+export type WetDfPaletteType = 'create.data-object'| 'create.data-store'| 'create.end-event'|'create.exclusive-gateway'|'create.group'
+|'create.intermediate-event'|'create.participant-expanded'|'create.start-event'|'create.subprocess-expanded'
+|'create.task;global-connect-tool'|'hand-tool'|'lasso-tool'|'space-tool'|'tool-separator'
 
 export const WetBpmnDesignProps = {
     xml:{
@@ -9,6 +15,16 @@ export const WetBpmnDesignProps = {
     json:{
         type:Object as PropType<Record<string,any>>,
         default:null
+    },
+    processType:{
+        type:String as PropType<WetBpmnProcessType>,
+        default:'flowable'
+    },
+    defaultPalettes:{
+        type:Array as PropType<WetDfPaletteType[]>,
+        default(){
+            return []
+        }
     }
 }
 
@@ -17,5 +33,8 @@ export const WetBpmnDesignMainPanelProps = {
 }
 
 export type BpmnProvideType = {
-    modules: ShallowRef<BpmnModuleDeclaration[]>
+    modules: ShallowRef<BpmnModuleDeclaration[]>,
+    modeler:ShallowRef<Modeler | null>,
+    seletedBpmnElement:ShallowRef<[BpmnElement | null]>,
+    processType:ComputedRef<WetBpmnProcessType>
 }
