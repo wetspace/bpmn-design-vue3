@@ -10,52 +10,17 @@
 </template>
 <script setup lang="ts">
 import { WetSchemaForm } from '@wetspace/pro-components'
-import type { WetProFormInstance } from '@wetspace/pro-components'
 import { ElButton } from 'element-plus'
-import type { BpmnModeling,BpmnModdle,BpmnModdleElement,BpmnElement} from '@/types/bpmn'
-// import useInject from '@/hooks/use-inject';
-import { computed,watch,ref,shallowRef, onMounted} from 'vue';
-import { useDebounceFn } from '@vueuse/core'
-import useInject from '@/hooks/use-inject';
 import useProperties from '@/hooks/use-properties';
 
-const { 
-        modeler,
-        seletedBpmnElement,
-        processType
-    } = useInject()
-
 const props = defineProps({
-    formType:String
+    formType:String,
+    bpmnModdleTag:String,
+    prefixModdleTag:String
 })
 
-const { $properties,seletedElementOne} = useProperties(props)
+const { $properties,formInit,formIns,saveAction} = useProperties(props)
 
-
-const formIns = shallowRef<WetProFormInstance>()
-
-const formInit = ref<Record<string,any>>({
-    id:'',
-    title:''
-})
-
-const isInited = shallowRef(false)
-const initValue = (v:BpmnElement)=>{
-    console.log(v)
-    const businessObject = v.businessObject
-    if(props.formType === 'base'){
-        formInit.value.id = businessObject.id || v.id
-        formInit.value.name = businessObject.name || v.name
-
-    }
-    isInited.value = true
-}
-
-watch(seletedElementOne,(v)=>{
-    if(v){
-        initValue(v)
-    }
-},{immediate:true})
 
 // onMounted(()=>{
 //     isInited.value = true
@@ -97,16 +62,4 @@ watch(seletedElementOne,(v)=>{
 //         // })
 //     }
 // },400)
-const saveAction = async ()=>{
-    const modeling = modeler.value?.get('modeling') as BpmnModeling
-    // const moddle = modeler.value?.get('moddle') as BpmnModdle
-    const _seletedBpmnElement = seletedBpmnElement.value[0]
-    if(!_seletedBpmnElement || !modeling) return 
-    if(props.formType === 'base'){
-        if(modeling){
-            const value = await formIns.value?.submit()
-            modeling.updateProperties(_seletedBpmnElement,value)
-        }
-    }
-}
 </script>

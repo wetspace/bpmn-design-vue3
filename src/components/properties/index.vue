@@ -23,8 +23,11 @@
                                </ElSpace>
                             </div>
                         </template>
-                        <div v-loading="!isSeleted" style="min-height: 100px;">
-                            <component :form-type="item.name" v-if="item.render && isSeleted" :is="item.render"></component>
+                        <div style="min-height: 100px;">
+                            <component 
+                            :bpmn-moddle-tag="item.bpmnModdleTag"
+                            :prefix-moddle-tag="item.prefixModdleTag"
+                            :form-type="item.name" v-if="item.render" :is="item.render"></component>
                         </div>
                     </ElCollapseItem>
                 </ElCollapse>
@@ -33,7 +36,7 @@
     </ElDrawer>
 </template>
 <script setup lang="ts">
-import { ElDrawer,ElCollapse,ElCollapseItem,ElSpace,ElIcon,ElLoading } from 'element-plus'
+import { ElDrawer,ElCollapse,ElCollapseItem,ElSpace,ElIcon, } from 'element-plus'
 import { EditPen,Document,Bell,Expand,Grid,LocationFilled} from '@element-plus/icons-vue'
 import { shallowRef,computed,watch } from 'vue'
 import useInject from '@/hooks/use-inject';
@@ -41,22 +44,14 @@ import Base from './base.vue'
 
 const visible  = shallowRef(true)
 const { seletedBpmnElement } = useInject()
-const isSeleted = shallowRef(true)
-const vLoading = ElLoading.directive
 
 const openCollapse = shallowRef(['base'])
 
-let isSeletedTime:number;
 watch(seletedBpmnElement,(v,oldv)=>{
     const newId = v[0]?.businessObject?.id || v[0]?.id
     const oldId = oldv[0]?.businessObject?.id || oldv[0]?.id
     if(newId === oldId) return
     openCollapse.value = ['base']
-    isSeleted.value = false;
-    clearTimeout(isSeletedTime)
-    isSeletedTime = setTimeout(()=>{
-        isSeleted.value = true
-    },100)
 },)
 
 const seletedBpmnElementInfo = computed(()=>{
@@ -86,11 +81,14 @@ const propertiesGroup = computed(()=>{
         {
             name:'executionListener',
             title:'执行监听器',
+            bpmnModdleTag:'extensionElements',
+            prefixModdleTag:'executionListener',
             render:Base,
             icon:Bell,
         },
         {
             name:'extensionElements',
+            bpmnModdleTag:'extensionElements',
             title:'扩展属性',
             render:Base,
             icon:Expand
