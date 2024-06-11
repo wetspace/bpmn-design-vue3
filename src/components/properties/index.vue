@@ -25,8 +25,6 @@
                         </template>
                         <div style="min-height: 100px;">
                             <component 
-                            :bpmn-moddle-tag="item.bpmnModdleTag"
-                            :prefix-moddle-tag="item.prefixModdleTag"
                             :form-type="item.name" v-if="item.render" :is="item.render"></component>
                         </div>
                     </ElCollapseItem>
@@ -37,10 +35,13 @@
 </template>
 <script setup lang="ts">
 import { ElDrawer,ElCollapse,ElCollapseItem,ElSpace,ElIcon, } from 'element-plus'
-import { EditPen,Document,Bell,Expand,Grid,LocationFilled} from '@element-plus/icons-vue'
+import { EditPen,Document,Expand,Grid,LocationFilled} from '@element-plus/icons-vue'
 import { shallowRef,computed,watch } from 'vue'
 import useInject from '@/hooks/use-inject';
+
 import Base from './base.vue'
+import Documentation from './documentation.vue'
+import ExtensionElements from './extensionElements.vue'
 
 const visible  = shallowRef(true)
 const { seletedBpmnElement } = useInject()
@@ -75,22 +76,13 @@ const propertiesGroup = computed(()=>{
         {
             name:'documentation',
             title:'文档设置',
-            render:Base,
+            render:Documentation,
             icon:Document
         },
         {
-            name:'executionListener',
-            title:'执行监听器',
-            bpmnModdleTag:'extensionElements',
-            prefixModdleTag:'executionListener',
-            render:Base,
-            icon:Bell,
-        },
-        {
             name:'extensionElements',
-            bpmnModdleTag:'extensionElements',
             title:'扩展属性',
-            render:Base,
+            render:ExtensionElements,
             icon:Expand
         }
     ]

@@ -7,8 +7,7 @@ import { WetBpmnDesignProps } from './types'
 import { bpmnstate } from './symbol'
 import MainPanel from './main-panel.vue'
 import type Modeler from 'bpmn-js/lib/Modeler'
-import type { BpmnProvideType } from './types'
-import type { BpmnModuleDeclaration } from './types/bpmn'
+import type { BpmnProvideType,BpmnModuleDeclaration } from './types'
 import type {  BpmnElement } from './types/bpmn'
 
 const props = defineProps(WetBpmnDesignProps)

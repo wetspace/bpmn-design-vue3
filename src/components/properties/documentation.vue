@@ -13,75 +13,66 @@ import { computed,ref,shallowRef,watch } from 'vue'
 import { WetSchemaForm } from '@wetspace/pro-components'
 import { ElButton } from 'element-plus'
 import useInject from '@/hooks/use-inject';
-import type { BpmnPropertiesFormItem,BpmnPropertiesFormIns,BpmnElement,BpmnModeling } from '@/types'
-
+import type { BpmnPropertiesFormItem,BpmnPropertiesFormIns,BpmnElement,BpmnModdleElement } from '@/types'
 const formIns = shallowRef<BpmnPropertiesFormIns>()
 const { 
-    modeler,
     seletedElement,
+    getUpadateProperties
 } = useInject()
 
 const formInit = ref<Record<string,any>>({})
+const parentElement = shallowRef<BpmnModdleElement>()
 
 const $properties = computed(()=>{
-    const bpmnElementType = seletedElement.value?.type
-
     const base:BpmnPropertiesFormItem[] = [
         {
-            property:'id',
-            title:'ID',
-            disabled:true,
-        },
-        {
-            property:'name',
-            title:'节点名称'
-        }
-    ]
-    let res = base
-    if(bpmnElementType === 'bpmn:Process'){
-        res = [...base,{
-            property:'versionTag',
-            title:'版本标签',
-        },{
-            property:'isExecutable',
-            title:'可执行',
-            valueType:'switch',
+            property:'text',
+            title:'文档内容',
             formItemProps:{
-                activeValue:'11',
-                activeText:'是',
-                inactiveText:'否',
-                inactiveValue:'22'
+                type:'textarea'
             }
-        },{
-            property:'taskPriority',
-            title:'流程优先级'
-        }]
-    }
-    
+        },
+    ]
+    let res = base    
     return res
 })
 
 const isInited = shallowRef(false)
-const initValue = (v:BpmnElement,p:BpmnPropertiesFormItem[])=>{
+const initValue = (v:BpmnElement)=>{
     formIns.value?.clear()
     const businessObject = v.businessObject || {}
-    p.forEach(item=>{
-        formInit.value[item.property] = businessObject[item.property]
-    })
+    const documentation = businessObject.documentation && businessObject.documentation[0]
+    parentElement.value = documentation
+    console.log(parentElement.value)
+    if(documentation){
+        formInit.value = {
+            text:documentation.text
+        }
+    }
     isInited.value = true
 }
 
 watch([seletedElement,$properties],([v,p])=>{
     if(v && p){
-        initValue(v,p)
+        initValue(v)
     }
 },{immediate:true})
 
 const saveAction = async ()=>{
-    const modeling = modeler.value?.get('modeling') as BpmnModeling
+    const { modeling,moddle } = getUpadateProperties()
     if(modeling && seletedElement.value){
         const value = await formIns.value?.submit()
-        modeling.updateProperties(seletedElement.value,value)
+        if(parentElement.value){
+            modeling.updateModdleProperties(seletedElement.value,parentElement.value,{
+                text:value.documentation
+            })
+        }else{
+            const $m = moddle.create(`bpmn:Documentation`,value)
+            console.log($m,value)
+            modeling.updateProperties(seletedElement.value,{
+                documentation:[$m]
+            })
+        }
     }
 }
 </script>

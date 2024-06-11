@@ -10,8 +10,7 @@ import { WetBpmnDesignMainPanelProps } from './types'
 import { onMounted,shallowRef,inject,computed } from 'vue'
 import { bpmnstate } from './symbol'
 import { createNewDiagram } from './utils'
-import type {  BpmnElement,BpmnEventBus } from './types/bpmn'
-import type { BpmnProvideType } from './types'
+import type { BpmnProvideType,BpmnElement,BpmnEventBus } from './types'
 
 import PropertiesForm from './components/properties/index.vue'
 
@@ -72,14 +71,10 @@ const init = async ()=>{
     const elementEvents = ['element.click','element.changed']
     elementEvents.forEach(event=>{
         eventBus.on(event,(e=>{
-            // console.log('xxxx',e,event)
             if(event === 'element.click'){
-                // console.log('xxxx',e)
                 const element = (e as any).element as BpmnElement
                 if(element){
-                    // console.log(element)
                     seletedBpmnElement.value = [element]
-                    // console.log('xxxx')
                 }
             }
         }))

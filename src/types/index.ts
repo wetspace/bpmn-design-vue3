@@ -1,7 +1,8 @@
 import type { PropType,ShallowRef,ComputedRef} from 'vue'
 import type { BpmnModuleDeclaration,BpmnElement} from './bpmn'
 import type Modeler from 'bpmn-js/lib/Modeler'
-import type { WetSchemaItemType } from '@wetspace/pro-components'
+import type { WetSchemaItemType,WetSchemaFormInstance} from '@wetspace/pro-components'
+// import type { WetProFormInstance } from '@wetspace/pro-components'
 
 export type WetBpmnProcessType = 'activiti' | 'camunda'|'flowable'
 export type WetDfPaletteType = 'create.data-object'| 'create.data-store'| 'create.end-event'|'create.exclusive-gateway'|'create.group'
@@ -40,7 +41,14 @@ export type BpmnProvideType = {
     processType:ComputedRef<WetBpmnProcessType>
 }
 
-export type BpmnPropertiesFormItem = WetSchemaItemType & {
-    isBpmnModdleElement?:boolean,
-    isOnlyPropery?:boolean
+export type BpmnPropertiesFormItem = Omit<WetSchemaItemType,'property'> & {
+    // isBpmnModdleElement?:boolean,
+    // isOnlyPropery?:boolean,
+    property:string,
+    bpmnElement?: string | string[],
+    prefixElement?: string | string[]
 }
+
+export type BpmnPropertiesFormIns = WetSchemaFormInstance
+
+export * from './bpmn'
