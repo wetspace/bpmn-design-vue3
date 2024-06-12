@@ -2,7 +2,7 @@
     <MainPanel v-if="!isRefresh" v-bind="props"></MainPanel>
 </template>
 <script setup lang="ts">
-import { provide,shallowRef,computed } from 'vue'
+import { provide,shallowRef,computed,ref} from 'vue'
 import { WetBpmnDesignProps } from './types'
 import { bpmnstate } from './symbol'
 import MainPanel from './main-panel.vue'
@@ -16,6 +16,7 @@ const modelerInstance = shallowRef<Modeler | null>(null)
 const isRefresh = shallowRef(false)
 const modules = shallowRef<BpmnModuleDeclaration[]>([])
 const seletedBpmnElement = shallowRef<[BpmnElement | null]>([null])
+const addedBpmnElementsMap = ref<Record<string,any>>({})
 
 const processType = computed(()=>props.processType)
 
@@ -23,6 +24,8 @@ provide<BpmnProvideType>(bpmnstate,{
     modules,
     modeler:modelerInstance,
     seletedBpmnElement,
-    processType
+    processType,
+    addedBpmnElementsMap,
+    elementProperties:computed(()=>props.elementProperties || {})
 })
 </script>

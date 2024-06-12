@@ -7,7 +7,7 @@
 </template>
 <script setup lang="ts">
 import { WetBpmnDesignMainPanelProps } from './types'
-import { onMounted,shallowRef,inject,computed } from 'vue'
+import { onMounted,shallowRef,inject,computed,unref } from 'vue'
 import { bpmnstate } from './symbol'
 import { createNewDiagram } from './utils'
 import type { BpmnProvideType,BpmnElement,BpmnEventBus } from './types'
@@ -26,6 +26,7 @@ const ProcessTypes = {
 }
 
 const containerRef = shallowRef<HTMLDivElement>()
+let rootElement:BpmnElement;
 
 const props = defineProps(WetBpmnDesignMainPanelProps)
 
@@ -39,11 +40,26 @@ const moddleExtensions = computed(()=>{
 const { 
     modules,
     modeler,
-    seletedBpmnElement
+    seletedBpmnElement,
+    addedBpmnElementsMap
 } = inject(bpmnstate) as BpmnProvideType
 
+const addedBpmnElements = (element:BpmnElement)=>{
+    if(!addedBpmnElementsMap.value[element.id]){
+        addedBpmnElementsMap.value[element.id] = unref(element)
+    }
+}
+
 const init = async ()=>{
-    const events = ['shape.added', 'shape.move.end', 'shape.removed', 'connect.end', 'connect.move']
+    const events = [
+        'shape.added', 
+        'shape.move.end',
+        'shape.removed', 
+        'connect.end', 
+        'connect.move',
+        'connection.delete',
+        'connection.add', 
+    ]
     const res = await import('bpmn-js/lib/Modeler')
     const Modeler = res.default
     modeler.value = new Modeler({
@@ -58,11 +74,16 @@ const init = async ()=>{
     // 注册modeler事件
     events.forEach(event =>{
         modeler.value?.on(event,(e:any)=>{
-            // console.log(event)
-            if(event === 'shape.added'){
-                const element = e.element as BpmnElement
-                const shape = element ? elementRegistry.get(element.id) :e.shape
+            // console.log(e,'event')
+            const element = e.element as BpmnElement
+            const shape = element ? elementRegistry.get(element.id) :e.shape
+            if(event === 'shape.added' || event === 'connection.add'){
                 seletedBpmnElement.value = [shape]
+                addedBpmnElements(element)
+            }else if(event === 'shape.removed' || event === 'connection.delete'){
+                seletedBpmnElement.value = [rootElement]
+                addedBpmnElementsMap.value[element.id] = null
+                delete addedBpmnElementsMap.value[element.id]
             }
         })
     })
@@ -74,6 +95,7 @@ const init = async ()=>{
             if(event === 'element.click'){
                 const element = (e as any).element as BpmnElement
                 if(element){
+                    console.log(element)
                     seletedBpmnElement.value = [element]
                 }
             }
@@ -84,7 +106,9 @@ const init = async ()=>{
     })
     const bpmnProcessElement = elementRegistry.find((item:any)=>item.type === 'bpmn:Process') as BpmnElement
     if(bpmnProcessElement){
+        rootElement = bpmnProcessElement
         seletedBpmnElement.value = [bpmnProcessElement]
+        addedBpmnElements(rootElement)
     }
 }
 onMounted(()=>{

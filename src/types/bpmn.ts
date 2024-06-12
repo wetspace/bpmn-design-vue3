@@ -13,3 +13,5 @@ export type BpmnModdleElement = ModdleElement
 export type BpmnModdle = {
     create(type: string, properties?: Record<string,any>): BpmnModdleElement;
 }
+
+export type BpmnDfElements = 'bpmn:StartEvent' | ''

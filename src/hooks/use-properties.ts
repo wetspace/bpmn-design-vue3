@@ -24,9 +24,19 @@ export default ()=>{
         }
     }
 
+    const seletedElementType = computed(()=>{
+        return seletedElement.value?.type
+    })
+    
+    const seletedElementId = computed(()=>{
+        return seletedElement.value?.id
+    })
+
     return {
         ...res,
         seletedElement,
-        getUpadateProperties
+        getUpadateProperties,
+        seletedElementType,
+        seletedElementId
     }
 }

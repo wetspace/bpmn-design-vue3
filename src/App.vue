@@ -1,6 +1,12 @@
 <template>
   <div style="height: 100vh;">
-    <BpmnDesign></BpmnDesign>
+    <BpmnDesign :elements="{
+      'base':[],
+      'bpmn:StartEvent':{
+        groups:[],
+        render:null,
+      }
+    }"></BpmnDesign>
   </div>
 </template>
 <script setup lang="ts">

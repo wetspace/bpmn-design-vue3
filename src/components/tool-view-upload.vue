@@ -5,7 +5,7 @@
 </template>
 <script setup lang="ts">
 import { ElSpace,ElIcon,ElButton,ElButtonGroup } from 'element-plus'
-import useInject from '@/hooks/use-inject';
+import useInject from '@/hooks/use-properties';
 
 const { 
     modules,
