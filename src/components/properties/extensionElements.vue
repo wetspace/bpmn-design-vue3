@@ -83,10 +83,12 @@ watch([seletedElement,$properties],async ([v,p])=>{
 },{immediate:true})
 
 const saveAction = async ()=>{
+    // console.log('调用更新')
     if(!isInited.value) return
     const { modeling,moddle } = getUpadateProperties()
     if(modeling && seletedElement.value){
         const value = await formIns.value?.submit()
+        console.log(value.properties,'调用更新')
         const updateValueChild = value.properties.map((item:{name:string,value:string}[])=>{
             return moddle.create(`${processType.value}:Property`,item || {name:undefined,value:undefined})
         })

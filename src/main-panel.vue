@@ -10,7 +10,7 @@ import { WetBpmnDesignMainPanelProps } from './types'
 import { onMounted,shallowRef,inject,computed,unref } from 'vue'
 import { bpmnstate } from './symbol'
 import { createNewDiagram } from './utils'
-import type { BpmnProvideType,BpmnElement,BpmnEventBus } from './types'
+import type { BpmnProvideType,BpmnElement,BpmnEventBus,BpmnEvent } from './types'
 
 import PropertiesForm from './components/properties/index.vue'
 
@@ -73,13 +73,11 @@ const init = async ()=>{
     const elementRegistry:any = modeler.value.get('elementRegistry')
     // 注册modeler事件
     events.forEach(event =>{
-        modeler.value?.on(event,(e:any)=>{
-            // console.log(e,'event')
-            const element = e.element as BpmnElement
-            const shape = element ? elementRegistry.get(element.id) :e.shape
+        modeler.value?.on(event,(e:BpmnEvent)=>{
+            const element = e.element
             if(event === 'shape.added' || event === 'connection.add'){
-                seletedBpmnElement.value = [shape]
                 addedBpmnElements(element)
+                seletedBpmnElement.value = [element]
             }else if(event === 'shape.removed' || event === 'connection.delete'){
                 seletedBpmnElement.value = [rootElement]
                 addedBpmnElementsMap.value[element.id] = null
@@ -91,13 +89,10 @@ const init = async ()=>{
     const eventBus = modeler.value.get('eventBus') as BpmnEventBus<string>
     const elementEvents = ['element.click','element.changed']
     elementEvents.forEach(event=>{
-        eventBus.on(event,(e=>{
+        eventBus.on(event,((e:BpmnEvent)=>{
+            const element = e.element
             if(event === 'element.click'){
-                const element = (e as any).element as BpmnElement
-                if(element){
-                    console.log(element)
-                    seletedBpmnElement.value = [element]
-                }
+                seletedBpmnElement.value = [element]
             }
         }))
     })

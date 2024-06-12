@@ -2,8 +2,8 @@
 
         <div class="wet-bpmn-properties__content">
             <div class="wet-bpmn-properties__hd">
-                <el-icon>
-                    <component :is="seletedBpmnElementInfo.icon"></component>
+                <el-icon :size="20" :class="seletedBpmnElementInfo.class">
+                    <component v-if="!seletedBpmnElementInfo.class" :is="seletedBpmnElementInfo.icon"></component>
                 </el-icon>
                 <span style="margin-left: 10px;">{{ seletedBpmnElementInfo.title }}</span>
             </div>
@@ -33,7 +33,7 @@
 </template>
 <script setup lang="ts">
 import { ElCollapse,ElCollapseItem,ElSpace,ElIcon, } from 'element-plus'
-import { EditPen,Document,Expand,Grid,LocationFilled} from '@element-plus/icons-vue'
+import { EditPen,Document,Expand,Grid,LocationFilled,TopRight,Ticket,Coin} from '@element-plus/icons-vue'
 import { shallowRef,computed,watch,onMounted} from 'vue'
 import useInject from '@/hooks/use-properties';
 
@@ -41,25 +41,65 @@ import Base from './base.vue'
 import Documentation from './documentation.vue'
 import ExtensionElements from './extensionElements.vue'
 
-const { seletedBpmnElement,elementProperties,seletedElementType } = useInject()
+const { seletedElement,elementProperties,seletedElementType } = useInject()
 
 const openCollapse = shallowRef(['base'])
 
-watch(seletedBpmnElement,(v,oldv)=>{
-    const newId = v[0]?.businessObject?.id || v[0]?.id
-    const oldId = oldv[0]?.businessObject?.id || oldv[0]?.id
+watch(seletedElement,(v,oldv)=>{
+    const newId = v?.businessObject?.id || v?.id
+    const oldId = oldv?.businessObject?.id || oldv?.id
     if(newId === oldId) return
     openCollapse.value = ['base']
 },)
 
 const seletedBpmnElementInfo = computed(()=>{
-    const element = seletedBpmnElement.value?.[0]
-    // console.log(element)
-    return {
-        title: element?.type === 'bpmn:Process'? "流程":'节点',
-        icon: element?.type === 'bpmn:Process'? Grid:LocationFilled,
-        type: element?.type
+    const element = seletedElement.value
+    console.log(element)
+    const res = {
+        title: "流程",
+        icon: LocationFilled,
+        type: element?.type,
+        class:''
     }
+
+    switch(element?.type){
+        case 'bpmn:Process':{
+            res.title = '流程'
+            res.icon= Grid
+            break;
+        }
+        case 'bpmn:SequenceFlow':{
+            res.icon = TopRight
+            res.title = '流转过程'
+            break;
+        }
+        case 'bpmn:DataObjectReference':{
+            res.icon = Ticket
+            res.title = '数据对象'
+            break;
+        }
+        case 'bpmn:DataStoreReference':{
+            res.icon = Coin
+            res.title = '数据仓库'
+            break;
+        }
+        case 'bpmn:Group':{
+            res.title = '群组'
+            res.class = 'bpmn-icon-group'
+            break;
+        }
+        case 'bpmn:Participant':{
+            res.title = '泳道'
+            res.class= 'bpmn-icon-participant'
+            break;
+        }
+        default:{
+            res.icon = LocationFilled
+            res.title = '节点'
+        }
+    }
+
+    return res
 })
 
 const mergeArraysWithOrder = (a:any[], b:any[]) => {
