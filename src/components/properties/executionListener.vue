@@ -4,15 +4,11 @@
     @change="saveAction"
     :inital-values="formInit"
     :properties="$properties" :span="24"></WetSchemaForm>
-    <!-- <div style="display: flex;">
-        <ElButton type="primary" style="display:flex;flex: 1;" @click="saveAction">保存</ElButton>
-        <ElButton style="display:flex;flex: 1;">取消</ElButton>
-    </div> -->
 </template>
 <script setup lang="ts">
 import { computed,ref,shallowRef,onMounted} from 'vue'
 import { WetSchemaForm } from '@wetspace/pro-components'
-// import { ElButton } from 'element-plus'
+import listener from '../listener-form/index.vue';
 import useInject from '@/hooks/use-properties';
 import type { BpmnPropertiesFormItem,BpmnPropertiesFormIns,BpmnElement,BpmnModdleElement } from '@/types'
 const formIns = shallowRef<BpmnPropertiesFormIns>()
@@ -29,23 +25,8 @@ const parentProperties = shallowRef<BpmnModdleElement>()
 const $properties = computed(()=>{
     const base:BpmnPropertiesFormItem[] = [
         {
-            property:'properties',
-            valueType:'array',
-            formItemProps:{
-                showBottomAdd:true,
-                showActions:false,
-                showRowActions:['add','delete'],
-                columns:[
-                    {
-                        label:'属性名',
-                        prop:'name',
-                    },
-                    {
-                        label:'属性值',
-                        prop:'value'
-                    }
-                ]
-            }
+            property:'listener',
+            renderFormItem:listener
         },
     ]
     let res = base    

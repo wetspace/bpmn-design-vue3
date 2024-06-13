@@ -4,29 +4,25 @@
     @change="saveAction"
     :inital-values="formInit"
     :properties="$properties" :span="24"></WetSchemaForm>
-    <!-- <div style="display: flex;">
-        <ElButton type="primary" style="display:flex;flex: 1;" @click="saveAction">保存</ElButton>
-        <ElButton style="display:flex;flex: 1;">取消</ElButton>
-    </div> -->
 </template>
 <script setup lang="ts">
 import { computed,ref,shallowRef,watch,nextTick } from 'vue'
 import { WetSchemaForm } from '@wetspace/pro-components'
 // import { ElButton } from 'element-plus'
-import useInject from '@/hooks/use-properties';
+import usePropertiesForm from '@/hooks/use-properties-form';
 import type { BpmnPropertiesFormItem,BpmnPropertiesFormIns,BpmnElement,BpmnModeling } from '@/types'
 
 const formIns = shallowRef<BpmnPropertiesFormIns>()
 const { 
     modeler,
-    seletedElement,
-} = useInject()
+    seletedElementId,
+    currentElement,
+} = usePropertiesForm()
 
 const formInit = ref<Record<string,any>>({})
 
 const $properties = computed(()=>{
-    const bpmnElementType = seletedElement.value?.type
-
+    const bpmnElementType = currentElement.value?.type
     const base:BpmnPropertiesFormItem[] = [
         {
             property:'id',
@@ -64,7 +60,7 @@ const $properties = computed(()=>{
 
 const isInited = shallowRef(false)
 const initValue = (v:BpmnElement,p:BpmnPropertiesFormItem[])=>{
-    formIns.value?.clear()
+    isInited.value = false
     const businessObject = v.businessObject || {}
     p.forEach(item=>{
         formInit.value[item.property] = businessObject[item.property]
@@ -72,21 +68,22 @@ const initValue = (v:BpmnElement,p:BpmnPropertiesFormItem[])=>{
     isInited.value = true
 }
 
-watch([seletedElement,$properties],async ([v,p])=>{
-    if(v && p){
+
+watch(seletedElementId,async (v)=>{
+    if(currentElement.value && currentElement.value.id === v){
         await nextTick()
-        initValue(v,p)
+        initValue(currentElement.value,$properties.value)
     }
-},{immediate:true})
+},{
+    immediate:true
+})
 
 const saveAction = async ()=>{
-    console.log('change,触发')
     if(!isInited.value) return
-    console.log('谢谢谢谢')
     const modeling = modeler.value?.get('modeling') as BpmnModeling
-    if(modeling && seletedElement.value){
+    if(modeling && currentElement.value){
         const value = await formIns.value?.submit()
-        modeling.updateProperties(seletedElement.value,value)
+        modeling.updateProperties(currentElement.value,value)
     }
 }
 </script>

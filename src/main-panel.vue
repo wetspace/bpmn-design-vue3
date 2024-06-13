@@ -46,7 +46,10 @@ const {
 
 const addedBpmnElements = (element:BpmnElement)=>{
     if(!addedBpmnElementsMap.value[element.id]){
-        addedBpmnElementsMap.value[element.id] = unref(element)
+        addedBpmnElementsMap.value[element.id] = {
+            element:unref(element),
+            error:[]
+        }
     }
 }
 
@@ -57,7 +60,7 @@ const init = async ()=>{
         'shape.removed', 
         'connect.end', 
         'connect.move',
-        'connection.delete',
+        'connection.removed',
         'connection.add', 
     ]
     const res = await import('bpmn-js/lib/Modeler')
@@ -78,7 +81,8 @@ const init = async ()=>{
             if(event === 'shape.added' || event === 'connection.add'){
                 addedBpmnElements(element)
                 seletedBpmnElement.value = [element]
-            }else if(event === 'shape.removed' || event === 'connection.delete'){
+            }else if(event === 'shape.removed' || event === 'connection.removed'){
+                // console.log('connection.removed')
                 seletedBpmnElement.value = [rootElement]
                 addedBpmnElementsMap.value[element.id] = null
                 delete addedBpmnElementsMap.value[element.id]

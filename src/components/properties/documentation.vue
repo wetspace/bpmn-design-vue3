@@ -10,7 +10,7 @@
     </div> -->
 </template>
 <script setup lang="ts">
-import { computed,ref,shallowRef,watch,nextTick } from 'vue'
+import { computed,ref,shallowRef,onMounted } from 'vue'
 import { WetSchemaForm } from '@wetspace/pro-components'
 // import { ElButton } from 'element-plus'
 import useInject from '@/hooks/use-properties';
@@ -44,7 +44,7 @@ const initValue = (v:BpmnElement)=>{
     const businessObject = v.businessObject || {}
     const documentation = businessObject.documentation && businessObject.documentation[0]
     parentElement.value = documentation
-    console.log(parentElement.value)
+    // console.log(parentElement.value)
     if(documentation){
         formInit.value = {
             text:documentation.text
@@ -53,14 +53,14 @@ const initValue = (v:BpmnElement)=>{
     isInited.value = true
 }
 
-watch([seletedElement,$properties], async ([v,p])=>{
-    if(v && p){
-        await nextTick()
-        initValue(v)
+onMounted(()=>{
+    if(seletedElement.value){
+        initValue(seletedElement.value)
     }
-},{immediate:true})
+})
 
 const saveAction = async ()=>{
+    console.log('change,触发-docs')
     if(!isInited.value) return
     const { modeling,moddle } = getUpadateProperties()
     if(modeling && seletedElement.value){

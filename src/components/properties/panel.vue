@@ -1,60 +1,63 @@
 <template>
-
-        <div class="wet-bpmn-properties__content">
-            <div class="wet-bpmn-properties__hd">
-                <el-icon :size="20" :class="seletedBpmnElementInfo.class">
-                    <component v-if="!seletedBpmnElementInfo.class" :is="seletedBpmnElementInfo.icon"></component>
-                </el-icon>
-                <span style="margin-left: 10px;">{{ seletedBpmnElementInfo.title }}</span>
-            </div>
-            <div  class="wet-bpmn-properties__body">
-                <ElCollapse v-model="openCollapse" accordion>
-                    <ElCollapseItem v-for="item in propertiesGroup" :key="item.name" :name="item.name">
-                        <template #title>
-                            <div>
-                               <ElSpace>
-                                    <el-icon>
-                                        <component :is="item.icon"></component>
-                                    </el-icon>
-                                    <span style="font-weight: bold;">
-                                        {{ item.title }}
-                                    </span>
-                               </ElSpace>
-                            </div>
-                        </template>
-                        <div style="min-height: 100px;">
-                            <component 
-                            :form-type="item.name" v-if="item.render" :is="item.render"></component>
-                        </div>
-                    </ElCollapseItem>
-                </ElCollapse>
-            </div>
+    <div class="wet-bpmn-properties__content">
+        <div class="wet-bpmn-properties__hd">
+            <el-icon :size="20" :class="seletedBpmnElementInfo.class">
+                <component v-if="!seletedBpmnElementInfo.class" :is="seletedBpmnElementInfo.icon"></component>
+            </el-icon>
+            <span style="margin-left: 10px;">{{ seletedBpmnElementInfo.title }}</span>
         </div>
+        <div  class="wet-bpmn-properties__body">
+            <ElCollapse v-model="openCollapse" accordion>
+                <ElCollapseItem v-for="item in propertiesGroup" :key="item.name" :name="item.name">
+                    <template #title>
+                        <div>
+                            <ElSpace>
+                                <el-icon>
+                                    <component :is="item.icon"></component>
+                                </el-icon>
+                                <span style="font-weight: bold;">
+                                    {{ item.title }}
+                                </span>
+                            </ElSpace>
+                        </div>
+                    </template>
+                    <div style="min-height: 100px;">
+                        <component :element-id="props.elementId"
+                        v-if="item.render" :is="item.render"></component>
+                    </div>
+                </ElCollapseItem>
+            </ElCollapse>
+        </div>
+    </div>
 </template>
 <script setup lang="ts">
 import { ElCollapse,ElCollapseItem,ElSpace,ElIcon, } from 'element-plus'
-import { EditPen,Document,Expand,Grid,LocationFilled,TopRight,Ticket,Coin} from '@element-plus/icons-vue'
+import { EditPen,Document,Expand,Grid,LocationFilled,TopRight,Ticket,Coin,Monitor } from '@element-plus/icons-vue'
 import { shallowRef,computed,watch,onMounted} from 'vue'
 import useInject from '@/hooks/use-properties';
 
 import Base from './base.vue'
 import Documentation from './documentation.vue'
 import ExtensionElements from './extensionElements.vue'
+import ExecutionListener from './executionListener.vue'
 
-const { seletedElement,elementProperties,seletedElementType } = useInject()
-
+const { seletedElementId,elementProperties,addedBpmnElementsMap } = useInject()
+const props = defineProps({
+    elementId:{
+        type:String,
+        value:''
+    }
+})
 const openCollapse = shallowRef(['base'])
 
-watch(seletedElement,(v,oldv)=>{
-    const newId = v?.businessObject?.id || v?.id
-    const oldId = oldv?.businessObject?.id || oldv?.id
-    if(newId === oldId) return
-    openCollapse.value = ['base']
+watch(seletedElementId,(v,oldv)=>{
+    if(v!==oldv){
+        openCollapse.value = ['base']
+    }
 },)
 
 const seletedBpmnElementInfo = computed(()=>{
-    const element = seletedElement.value
-    console.log(element)
+    const element = addedBpmnElementsMap.value[props.elementId!]?.element
     const res = {
         title: "流程",
         icon: LocationFilled,
@@ -123,7 +126,9 @@ const mergeArraysWithOrder = (a:any[], b:any[]) => {
 }
 
 const propertiesGroup = computed(()=>{
-    const config = seletedElementType.value? elementProperties.value[seletedElementType.value]: null
+    const currentElment = addedBpmnElementsMap.value[props.elementId!]?.element
+    const seletedElementType = currentElment?.type
+    const config =  seletedElementType? elementProperties.value[seletedElementType]: null
     const base = mergeArraysWithOrder([
         {
             name:'base',
@@ -136,6 +141,12 @@ const propertiesGroup = computed(()=>{
             title:'文档设置',
             render:Documentation,
             icon:Document
+        },
+        {
+            name:'executionListener',
+            title:'执行监听器',
+            icon:Monitor,
+            render:ExecutionListener,
         },
         {
             name:'extensionElements',
