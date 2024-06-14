@@ -7,7 +7,7 @@
 </template>
 <script setup lang="ts">
 import { WetBpmnDesignMainPanelProps } from './types'
-import { onMounted,shallowRef,inject,computed,unref } from 'vue'
+import { onMounted,shallowRef,inject,computed } from 'vue'
 import { bpmnstate } from './symbol'
 import { createNewDiagram } from './utils'
 import type { BpmnProvideType,BpmnElement,BpmnEventBus,BpmnEvent } from './types'
@@ -45,12 +45,15 @@ const {
 } = inject(bpmnstate) as BpmnProvideType
 
 const addedBpmnElements = (element:BpmnElement)=>{
-    if(!addedBpmnElementsMap.value[element.id]){
-        addedBpmnElementsMap.value[element.id] = {
-            element:unref(element),
+    if(!addedBpmnElementsMap.value[element.businessObject.id]){
+        addedBpmnElementsMap.value[element.businessObject.id] = {
+            element,
             error:[]
         }
+    }else{
+        addedBpmnElementsMap.value[element.businessObject.id].element = element
     }
+    seletedBpmnElement.value = [element]
 }
 
 const init = async ()=>{
@@ -62,6 +65,8 @@ const init = async ()=>{
         'connect.move',
         'connection.removed',
         'connection.add', 
+        'selection.changed',
+        'element.changed'
     ]
     const res = await import('bpmn-js/lib/Modeler')
     const Modeler = res.default
@@ -78,14 +83,19 @@ const init = async ()=>{
     events.forEach(event =>{
         modeler.value?.on(event,(e:BpmnEvent)=>{
             const element = e.element
-            if(event === 'shape.added' || event === 'connection.add'){
-                addedBpmnElements(element)
-                seletedBpmnElement.value = [element]
+            if(event === 'selection.changed'){
+                const $element = e.newSelection?.[0]
+                console.log(e,'这个选择')
+                if($element){
+                    addedBpmnElements($element)
+                }else{
+                    seletedBpmnElement.value = [rootElement]
+                }
             }else if(event === 'shape.removed' || event === 'connection.removed'){
                 // console.log('connection.removed')
                 seletedBpmnElement.value = [rootElement]
-                addedBpmnElementsMap.value[element.id] = null
-                delete addedBpmnElementsMap.value[element.id]
+                addedBpmnElementsMap.value[element.businessObject.id] = null
+                delete addedBpmnElementsMap.value[element.businessObject.id]
             }
         })
     })
@@ -93,12 +103,7 @@ const init = async ()=>{
     const eventBus = modeler.value.get('eventBus') as BpmnEventBus<string>
     const elementEvents = ['element.click','element.changed']
     elementEvents.forEach(event=>{
-        eventBus.on(event,((e:BpmnEvent)=>{
-            const element = e.element
-            if(event === 'element.click'){
-                seletedBpmnElement.value = [element]
-            }
-        }))
+        eventBus.on(event,((e:BpmnEvent)=>{ }))
     })
     await createNewDiagram(modeler.value,{
         xml:props.xml

@@ -9,7 +9,9 @@ export type BpmnElement = Element
 export type BpmnEvent = {
     element:BpmnElement,
     gfx:HTMLOrSVGElement,
-    type:string
+    type:string,
+    newSelection?:BpmnElement[],
+    oldSelection?:BpmnElement[],
 }
 export type BpmnEventBus<D> = EventBus<D>
 export type BpmnModeling = Modeling

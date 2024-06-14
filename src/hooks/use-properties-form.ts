@@ -24,7 +24,7 @@ export default ()=>{
     }
     
     const seletedElementId = computed(()=>{
-        return seletedElement.value?.id
+        return seletedElement.value?.businessObject.id
     })
 
     const currentElement = computed(()=>{

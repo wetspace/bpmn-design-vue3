@@ -58,6 +58,7 @@ watch(seletedElementId,(v,oldv)=>{
 
 const seletedBpmnElementInfo = computed(()=>{
     const element = addedBpmnElementsMap.value[props.elementId!]?.element
+    const elementType = element?.type
     const res = {
         title: "流程",
         icon: LocationFilled,
@@ -67,38 +68,38 @@ const seletedBpmnElementInfo = computed(()=>{
 
     switch(element?.type){
         case 'bpmn:Process':{
-            res.title = '流程'
+            res.title = `流程(${elementType.split(':')[1]})`
             res.icon= Grid
             break;
         }
         case 'bpmn:SequenceFlow':{
             res.icon = TopRight
-            res.title = '流转过程'
+            res.title = `流转过程(${elementType.split(':')[1]})`
             break;
         }
         case 'bpmn:DataObjectReference':{
             res.icon = Ticket
-            res.title = '数据对象'
+            res.title = `数据对象(${elementType.split(':')[1]})`
             break;
         }
         case 'bpmn:DataStoreReference':{
             res.icon = Coin
-            res.title = '数据仓库'
+            res.title = `数据仓库(${elementType.split(':')[1]})`
             break;
         }
         case 'bpmn:Group':{
-            res.title = '群组'
+            res.title = `群组(${elementType.split(':')[1]})`
             res.class = 'bpmn-icon-group'
             break;
         }
         case 'bpmn:Participant':{
-            res.title = '泳道'
+            res.title = `泳道(${elementType.split(':')[1]})`
             res.class= 'bpmn-icon-participant'
             break;
         }
         default:{
             res.icon = LocationFilled
-            res.title = '节点'
+            res.title = `节点(${elementType.split(':')[1]})`
         }
     }
 
@@ -127,6 +128,7 @@ const mergeArraysWithOrder = (a:any[], b:any[]) => {
 
 const propertiesGroup = computed(()=>{
     const currentElment = addedBpmnElementsMap.value[props.elementId!]?.element
+    console.log(currentElment,'currentElment')
     const seletedElementType = currentElment?.type
     const config =  seletedElementType? elementProperties.value[seletedElementType]: null
     const base = mergeArraysWithOrder([

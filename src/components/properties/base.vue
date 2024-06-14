@@ -15,8 +15,9 @@ import type { BpmnPropertiesFormItem,BpmnPropertiesFormIns,BpmnElement,BpmnModel
 const formIns = shallowRef<BpmnPropertiesFormIns>()
 const { 
     modeler,
-    seletedElementId,
+    seletedElement,
     currentElement,
+    seletedElementId
 } = usePropertiesForm()
 
 const formInit = ref<Record<string,any>>({})
@@ -69,8 +70,8 @@ const initValue = (v:BpmnElement,p:BpmnPropertiesFormItem[])=>{
 }
 
 
-watch(seletedElementId,async (v)=>{
-    if(currentElement.value && currentElement.value.id === v){
+watch($properties,async (v)=>{
+    if(currentElement.value){
         await nextTick()
         initValue(currentElement.value,$properties.value)
     }
@@ -78,12 +79,21 @@ watch(seletedElementId,async (v)=>{
     immediate:true
 })
 
+// watch($properties,async (v)=>{
+//     if(currentElement.value && currentElement.value.id === v){
+//         await nextTick()
+//         initValue(currentElement.value,$properties.value)
+//     }
+// },{
+//     immediate:true
+// })
+
 const saveAction = async ()=>{
     if(!isInited.value) return
     const modeling = modeler.value?.get('modeling') as BpmnModeling
-    if(modeling && currentElement.value){
+    if(modeling && seletedElement.value){
         const value = await formIns.value?.submit()
-        modeling.updateProperties(currentElement.value,value)
+        modeling.updateProperties(seletedElement.value,value)
     }
 }
 </script>
